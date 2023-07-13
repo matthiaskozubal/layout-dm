@@ -21,6 +21,7 @@ def save_pred_to_json(list_files, pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False, w
     bbox_list = [[object for object in page[:n_objects]] for page in bbox_list]
     ## labels
     label_list = pred['label'].tolist()
+    label_list = label_list[:n_objects]
 
     # translate bbox_list and label_list into a dict and save
     output = dict()
@@ -29,10 +30,7 @@ def save_pred_to_json(list_files, pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False, w
         output[page] = {}
         ## print
         if verbatim:
-            print(f'Page {page}:')
-            print(f'bbox:\n{bbox_list[page]}')
-            print(f'label:\n{label_list[page]}\n\n')
-        
+            print(f'\nPage {page}:')
         for object_in_page in range(n_objects):
             ## for given page: grab a bbox tuple, resize, and add to a dict 
             file_name = list_files[object_in_page]
@@ -40,13 +38,13 @@ def save_pred_to_json(list_files, pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False, w
             bbox_tuple_resized = (bbox_tuple[0]*CANVAS_WIDTH, bbox_tuple[1]*CANVAS_LENGTH, bbox_tuple[2]*CANVAS_WIDTH, bbox_tuple[3]*CANVAS_LENGTH)
             bbox_tuple_resized_rounded = tuple(round(elem) for elem in bbox_tuple_resized)
             output[page][file_name] = bbox_tuple_resized_rounded   
-            ## save
-            output_file_path = os.path.join(OUTPUT_DIR, 'output.json')
-            with open(output_file_path, 'w') as output_file:
-                json.dump(output, output_file)
+            ### dump
+            #output_file_path = os.path.join(OUTPUT_DIR, 'output.json')
+            #with open(output_file_path, 'w') as output_file:
+            #    json.dump(output, output_file)
             ## print
             if verbatim:
-                print(f'{page}: {list_files[object_in_page]}: {tuple(bbox_list[page][object_in_page])}')
+                print(f'{os.path.basename(list_files[object_in_page])}:\t\t{tuple([round(elem, 3) for elem in bbox_list[page][object_in_page]])}')
             
     # save
     output_file_path = os.path.join(OUTPUT_DIR, 'predicted_layouts.json')

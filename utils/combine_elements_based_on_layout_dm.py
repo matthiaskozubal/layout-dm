@@ -1,20 +1,20 @@
 import os
 from PIL import Image, ImageDraw, ImageFont
-from trainer.global_configs import FONTS_DIR, OUTPUT_DIR
+from trainer.global_configs import FONTS_DIR, OUTPUT_DIR, CANVAS_WIDTH, CANVAS_LENGTH
 
-def combine_elements_based_on_layout_dm(output_from_layoutdm_pages, output_path=OUTPUT_DIR, font_path=f'{FONTS_DIR}/KohSantepheap-Regular.ttf', verbatim=False):
+def combine_elements_based_on_layout_dm(predicted_layout_pages, output_path=OUTPUT_DIR, font_path=f'{FONTS_DIR}/KohSantepheap-Regular.ttf', verbatim=False):
     """
-    output_from_layoutdm: {"testheader.header":(40, 50,500,300),"backgroundo.png":(100, 100, 200, 50),
+    predicted_layouts: {"testheader.header":(40, 50,500,300),"backgroundo.png":(100, 100, 200, 50),
     "iamtext.txt":(200, 200, 100, 100),
     "Cosmetic_Logo.png":(200, 200, 100, 100), 
     "Cosmetic_Logo copy.png":(10, 50, 100, 100)},
     output_path: "./here_my_output_image.png"
     """
 
-    n_pages = len(output_from_layoutdm_pages)
+    n_pages = len(predicted_layout_pages)
     for page in range(n_pages):
         # input for this function
-        output_from_layoutdm = output_from_layoutdm_pages[page]
+        predicted_layouts = predicted_layout_pages[page]
                 
         # create an empty list to store the inputs objects and coordinates
         image_list = []
@@ -23,12 +23,15 @@ def combine_elements_based_on_layout_dm(output_from_layoutdm_pages, output_path=
         header_list = []
         
         # run over dico of items
-        for file_path, coordinates in output_from_layoutdm.items():
+        for file_path, coordinates in predicted_layouts.items():
             try:
                 #handeling images
                 if file_path.lower().endswith(('.png', '.jpg', '.jpeg')):
                     #open the image file using PIL
                     image = Image.open(file_path)
+                    # resize
+                    if (image.size[0] > CANVAS_WIDTH) or (image.size[0] > CANVAS_LENGTH):
+                        image.thumbnail((CANVAS_WIDTH, CANVAS_LENGTH), Image.ANTIALIAS)
                     # convert image to RGBA mode
                     image = image.convert("RGBA")
                     # append the image object and coordinates to the respective lists
@@ -84,7 +87,7 @@ def combine_elements_based_on_layout_dm(output_from_layoutdm_pages, output_path=
         combined_image.save(output_path_name)
         ## print
         if verbatim:
-            print_output = {os.path.basename(key): val for key, val in output_from_layoutdm.items()}
-            print(f"Page {page}\nInput: {print_output}\nCombined image saved to: {output_path_name}\n")
+            input_print = {os.path.basename(key): val for key, val in predicted_layouts.items()}
+            print(f"\nPage {page}\nInput: {input_print}\nCombined image saved to: {output_path_name}\n")
 
 

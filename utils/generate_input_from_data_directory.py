@@ -15,6 +15,9 @@ def get_normalized_dimensions(image_path, canvas_width = CANVAS_WIDTH, canvas_le
         #normalise 
         normalized_width = width / canvas_width  #canvas width
         normalized_height = height / canvas_length #canvas height
+        # new approach (testing)
+        if (width > canvas_width) or (height > canvas_length):
+            image.thumbnail((canvas_width, canvas_length), Image.ANTIALIAS)
 
         return normalized_width, normalized_height
     
