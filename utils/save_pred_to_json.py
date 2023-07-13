@@ -49,7 +49,7 @@ def save_pred_to_json(list_files, pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False, w
                 print(f'{page}: {list_files[object_in_page]}: {tuple(bbox_list[page][object_in_page])}')
             
     # save
-    output_file_path = os.path.join(OUTPUT_DIR, 'output.json')
+    output_file_path = os.path.join(OUTPUT_DIR, 'predicted_layouts.json')
     with open(output_file_path, 'w') as output_file:
         if which_page_to_save == 'all':
             pass

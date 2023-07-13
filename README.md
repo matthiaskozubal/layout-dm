@@ -131,14 +131,17 @@ poetry run python3 eval.py <RESULT_DIR>
       - model_name='layoutdm_rico'
       - cond_type='cwh' (no rescaling, just repositioning)
       - n_samples=1
-      - 
+      - default mapping based on Rico labels: 'backgrounds': 'Background Image', 'images': 'Image', 'headers': 'Text', 'texts': 'Text' (can be changed in /src/trainer/trainer/global_configs.py)
   - access positions and sizes by `pred.x` and labels by `pred.y`
   - `output = save_pred_to_json(list_files, pred)`
-    - save the prediction in a json format
+    - save the prediction in a json format (predicted_layouts.json)
   - `combine_elements_based_on_layout_dm(output)`
     - use the layoutdm output prediction in json format stored in /output/ to combine the input data from /data/ and save them as the final output in /output/. Example:
-    - /output/output_option-1.json
-    - /output/output_option-1.png 
+    - /output/predicted_layouts.json
+    - /output/combined-images_option-1.png
+    - /output/combined-images_option-2.png
+    - ...
+    - /output/combined-images_option-<n_samples>.png
 4 Interpret the output
   - labels:
     - publaynet dataset: ['text', 'title', 'list', 'table', 'figure']
