@@ -1,8 +1,8 @@
 multirun
 download
+.vscode
 *.csv
 *.pdf
-*.png
 *.zip
 *.pt
 *.pth.tar

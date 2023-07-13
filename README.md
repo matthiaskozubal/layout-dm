@@ -17,20 +17,43 @@ Pytorch-geometry provides independent pre-build wheel for a *combination* of PyT
 
 
 ### How to install
-1. Install poetry (see [official docs](https://python-poetry.org/docs/)). We recommend to make a virtualenv and install poetry inside it.
+Tested on WSL
 
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
+#### Repo
+  ```bash
+  git clone https://github.com/matthiaskozubal/layout-dm
+  ```
+
+#### Python 
+- miniconda
+  ```bash
+  conda create -n layout-dm python=3.7 -y
+  conda activate layout-dm
+  ```
+
+#### Packages
+- poetry (see [official docs](https://python-poetry.org/docs/))
+  ```bash
+  pip install poetry==1.4.2
+  poetry env use $(wchich python)
+  poetry install  
+  ```
+
+**Optional**, instead of using poetry:
+- manual 
+  ```bash
+  pip install fsspec omegaconf torch==1.12.1 seaborn matplotlib torch-geometric==2.3.1 torchaudio==0.12.1 torchvision==0.13.1 hydra-core==1.1.2
+  ```
+
+#### Fonts
+  ```bash
+  sudo apt install fontconfig
+  fc-list | grep "LiberationSerif-Regular"
+  sudo apt-get install fonts-liberation
+  sudo fc-cache -f -v
 ```
 
-2. Install dependencies (it may be slow..)
-
-```bash
-poetry install
-```
-
-3. Download resources and unzip
-
+#### Download resources and unzip
 ``` bash
 wget https://github.com/CyberAgentAILab/layout-dm/releases/download/v1.0.0/layoutdm_starter.zip
 unzip layoutdm_starter.zip
@@ -76,7 +99,7 @@ poetry run python3 -m src.trainer.trainer.test \
 
 For example, if you want to test the provided LayoutDM model on `C->S+P`, the command is as follows:
 ```
-poetry run python3 -m src.trainer.trainer.test cond=c dataset_dir=./download/datasets job_dir=./download/pretrained/layoutdm_rico result_dir=tmp/dummy_results
+poetry run python3 -m src.trainer.trainer.test cond=c dataset_dir=./download/datasets job_dir=./download/pretrained_weights/layoutdm_rico result_dir=tmp/dummy_results
 ```
 
 Please refer to [TestConfig](src/trainer/trainer/hydra_configs.py#L12) for more options available.
@@ -88,6 +111,39 @@ Below are some popular options for <ADDITIONAL_ARGS>
 ```bash
 poetry run python3 eval.py <RESULT_DIR>
 ```
+
+## Run on custom input data
+### Based on data objects 
+1. Place your objects in proper /data/ subdirectories
+  - header files
+    - schema: `*.header`
+  - images 
+    - schema: `*_background.png`, `*_product.png`, or `*_logo.png`
+  - text files
+    - schema: `*.txt`
+2. Generate data from the data stored in /data/ subdirectories
+  - `generate_data()`
+    - to get the input for the layout dm in a form of an instance of torch_geometric.data.data.Data
+3. Make predictions
+  - `pred = predict_layout()`
+    - to get the predictions from the layour dm in a form of an instance of torch_geometric.data.data.Data
+    - defaults:
+      - model_name='layoutdm_rico'
+      - cond_type='cwh' (no rescaling, just repositioning)
+      - n_samples=1
+      - 
+  - access positions and sizes by `pred.x` and labels by `pred.y`
+  - `output = save_pred_to_json(list_files, pred)`
+    - save the prediction in a json format
+  - `combine_elements_based_on_layout_dm(output)`
+    - use the layoutdm output prediction in json format stored in /output/ to combine the input data from /data/ and save them as the final output in /output/. Example:
+    - /output/output_option-1.json
+    - /output/output_option-1.png 
+4 Interpret the output
+  - labels:
+    - publaynet dataset: ['text', 'title', 'list', 'table', 'figure']
+    - rico dataset: ['Text', 'Image', 'Icon', 'Text Button', 'List Item', 'Input', 'Background Image', 'Card', 'Web View', 'Radio Button', 'Drawer', 'Checkbox', 'Advertisement', 'Modal', 'Pager Indicator', 'Slider', 'On/Off Switch', 'Button Bar', 'Toolbar', 'Number Stepper', 'Multi-Tab', 'Date Picker', 'Map View', 'Video', 'Bottom Navigation']
+
 
 ## Citation
 
