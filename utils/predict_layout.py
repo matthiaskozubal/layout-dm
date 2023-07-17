@@ -29,7 +29,7 @@ target_index = 0  # index of real data, partial fields in it are used for condit
 
 
 ############## Function ######################################
-def predict_layout(data, list_files, model_name='layoutdm_rico', cond_type=cond_type, canvas_dimensions=None, W_CANVAS=W_CANVAS, n_samples=n_samples, target_index=target_index, verbatim=False, output_dir=OUTPUT_DIR):
+def predict_layout(data, list_files, model_name='layoutdm_rico', cond_type=cond_type, canvas_dimensions=None, W_CANVAS=W_CANVAS, n_samples=n_samples, target_index=target_index, verbatim=False, output_dir=OUTPUT_DIR, save_output=True):
     # paths
     job_dir = os.path.join(JOB_DIR, f"{model_name}", "0")
 
@@ -153,9 +153,11 @@ def predict_layout(data, list_files, model_name='layoutdm_rico', cond_type=cond_
         plt.title('Output')
         plt.show()
         
-    ## Save pred as .json file        
-    predicted_layout_json = save_pred_to_json(list_files, pred, output_dir=OUTPUT_DIR, canvas_dimensions=canvas_dimensions, verbatim=verbatim)
-
+    ## Save pred as .json file 
+    if save_output:           
+        predicted_layout_json = save_pred_to_json(list_files, pred, output_dir=OUTPUT_DIR, canvas_dimensions=canvas_dimensions, verbatim=verbatim)
+    else:
+        predicted_layout_json = None
         
     return pred, predicted_layout_json
     

@@ -52,7 +52,7 @@ def save_pred_to_json(list_files, pred, output_dir=OUTPUT_DIR, canvas_dimensions
             if verbatim:
                 filepath = list_files[object_in_page]
                 #print(f'{os.path.basename(filepath)}:\t{tuple([elem for elem in output[page][filepath]])}')
-                print(f'{os.path.basename(filepath)}:\t{bbox_tuple}')
+                print(f'{os.path.basename(filepath)}:\t\t{tuple(round(elem, 3) for elem in bbox_tuple)}')
             
     # save
     output_file_path = os.path.join(output_dir, 'predicted_layouts.json')

@@ -6,6 +6,8 @@ from trainer.global_configs import FONTS_DIR, OUTPUT_DIR
 import matplotlib.pyplot as plt
 import numpy as np
 
+from utils.draw_text_in_bbox import draw_text_in_bbox
+
 
 def combine_images_based_on_layout_dm(output_path=OUTPUT_DIR, font_path=f'{FONTS_DIR}/KohSantepheap-Regular.ttf', verbatim=False):
     """
@@ -87,13 +89,16 @@ def combine_images_based_on_layout_dm(output_path=OUTPUT_DIR, font_path=f'{FONTS
             draw.text(shifted_text_position, text, fill=text_color, font=font)
 
         # generate a text layer
-        draw = ImageDraw.Draw(combined_image)
+        #draw = ImageDraw.Draw(combined_image)
         for header, coordinates in header_list:
-            header_position = (coordinates[0], coordinates[1])
-            shifted_header_position = (coordinates[0] - coordinates[2]//2, coordinates[1] - coordinates[3]//2)
-            text_color = (255, 255, 255)  # color for the header (set to white)
-            font = ImageFont.truetype(font_path, 100)  # font type and size for header
-            draw.text(shifted_header_position, header, fill=text_color, font=font)
+            
+            draw_text_in_bbox(coordinates, font_path, header, combined_image)
+
+            #header_position = (coordinates[0], coordinates[1])
+            #shifted_header_position = (coordinates[0] - coordinates[2]//2, coordinates[1] - coordinates[3]//2)
+            #text_color = (255, 255, 255)  # color for the header (set to white)
+            #font = ImageFont.truetype(font_path, 100)  # font type and size for header
+            #draw.text(shifted_header_position, header, fill=text_color, font=font)
         
         # save the combined image to the specified output path
         output_path_name = os.path.join(output_path, f'combined-images_option-{page}.png')
