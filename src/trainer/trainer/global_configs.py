@@ -11,15 +11,17 @@ JOB_DIR = f"{ROOT}/pretrained_weights"
 
 
 # CANVAS
+SIZE = (360, 240)
 CANVAS_WIDTH = 1200
 CANVAS_LENGTH = 1200
 
 
 # DATA
 HOME_DIR  = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
-DATA_DIR  = os.path.abspath(os.path.join(HOME_DIR, 'data'))
+DATA_DIR  = os.path.abspath(os.path.join(HOME_DIR, 'input'))
 UTILS_DIR = os.path.abspath(os.path.join(HOME_DIR, 'utils'))
 FONTS_DIR = os.path.abspath(os.path.join(UTILS_DIR, 'fonts'))
+IMAGE_FILE_TYPES = ('.png', '.jpg')
 
 
 # OUTPUT
@@ -27,17 +29,13 @@ OUTPUT_DIR = os.path.abspath(os.path.join(HOME_DIR, 'output'))
 
 
 # for model
-'''
-Model labels:
-    - layoutdm_publaynet:
-        ['text', 'title', 'list', 'table', 'figure']
-    - layoutdm_rico:
-        ['Text', 'Image', 'Icon', 'Text Button', 'List
-        Item', 'Input', 'Background Image', 'Card', 'Web View', 'Radio Button',
+MODEL_LABELS = {
+    'layoutdm_publaynet':   ['text', 'title', 'list', 'table', 'figure'],
+    'layoutdm_rico':        ['Text', 'Image', 'Icon', 'Text Button', 'List Item','Input', 'Background Image', 'Card', 'Web View', 'Radio Button',
         'Drawer', 'Checkbox', 'Advertisement', 'Modal', 'Pager Indicator', 'Slider',
         'On/Off Switch', 'Button Bar', 'Toolbar', 'Number Stepper', 'Multi-Tab',
         'Date Picker', 'Map View', 'Video', 'Bottom Navigation']
-'''
+    }
 LABEL_MAP = {
     'backgrounds':  {'layoutdm_publaynet': 4, 'layoutdm_rico': 6},
     'images':       {'layoutdm_publaynet': 4, 'layoutdm_rico': 1},

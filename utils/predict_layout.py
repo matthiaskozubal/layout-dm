@@ -9,16 +9,17 @@ import torchvision.transforms as T
 from fsspec.core import url_to_fs
 from hydra.utils import instantiate
 from trainer.data.util import AddCanvasElement, AddRelationConstraints, sparse_to_dense
-from trainer.global_configs import DATASET_DIR, JOB_DIR
+from trainer.global_configs import DATASET_DIR, JOB_DIR, SIZE, OUTPUT_DIR
 from trainer.helpers.layout_tokenizer import LayoutSequenceTokenizer
 from trainer.helpers.sampling import SAMPLING_CONFIG_DICT
 from trainer.helpers.task import get_cond, filter_canvas
 from trainer.helpers.visualization import save_gif, save_image, save_label, save_label_with_size, save_relation
 from trainer.hydra_configs import TestConfig
+from utils.save_pred_to_json import save_pred_to_json
 
 
 ############## Setup #########################################
-SIZE = (360, 240)
+
 
 # user tunable parameters
 # cond_type, W_CANVAS = "relation", True  # uncomment this line if you want to try relation task
@@ -28,7 +29,7 @@ target_index = 0  # index of real data, partial fields in it are used for condit
 
 
 ############## Function ######################################
-def predict_layout(data, model_name='layoutdm_rico', cond_type=cond_type, W_CANVAS=W_CANVAS, n_samples=n_samples, target_index=target_index, plot_images=False, print_output=True):
+def predict_layout(data, list_files, model_name='layoutdm_rico', cond_type=cond_type, canvas_dimensions=None, W_CANVAS=W_CANVAS, n_samples=n_samples, target_index=target_index, verbatim=False, output_dir=OUTPUT_DIR):
     # paths
     job_dir = os.path.join(JOB_DIR, f"{model_name}", "0")
 
@@ -75,9 +76,13 @@ def predict_layout(data, model_name='layoutdm_rico', cond_type=cond_type, W_CANV
         assert cond_type != "relation"
         transform = None
     dataset = instantiate(train_cfg.dataset)(split="test", transform=transform)
+    if not canvas_dimensions: #canvas_size is (height, width), while canvas_dimensions from generate_input_from_data_directory() is (width, height)
+        canvas_size = SIZE
+    else:
+        canvas_size = (canvas_dimensions[1], canvas_dimensions[0])
     save_kwargs = {
         "colors": dataset.colors, "names": dataset.labels,
-        "canvas_size": SIZE, "use_grid": True,
+        "canvas_size": canvas_size, "use_grid": True,
         # "draw_label": True,
     }
     
@@ -95,11 +100,13 @@ def predict_layout(data, model_name='layoutdm_rico', cond_type=cond_type, W_CANV
     if W_CANVAS:
         gt = filter_canvas(gt)  # remove canvas attributes before visualization
     img_input = save_image(gt["bbox"], gt["label"], gt["mask"], **save_kwargs) 
-    if plot_images:
+    if verbatim:
+        print('\n', 20*'#', ' Input visualization, elements and their dimensions', 20*'#')
         plt.axis("off")
         plt.imshow(img_input)
         plt.title('Input')
         plt.show()
+
 
     # Conditional Generation
     ## Prediction
@@ -113,7 +120,8 @@ def predict_layout(data, model_name='layoutdm_rico', cond_type=cond_type, W_CANV
 
 
     ## Visualization of conditional inputs
-    if plot_images:
+    if verbatim:
+        print('\n', 20*'#', ' Input visualization, labels ', 20*'#')
         plt.axis("off")
         input_ = model.tokenizer.decode(cond["seq"].cpu())
         mask = pred["mask"][0]
@@ -137,13 +145,18 @@ def predict_layout(data, model_name='layoutdm_rico', cond_type=cond_type, W_CANV
 
 
     ## Visualization of outputs
-    if plot_images:    
+    if verbatim:    
+        print('\n', 20*'#', ' Output visualization ', 20*'#')        
         fig, ax = plt.subplots(figsize=(15, 5))
         ax.set_axis_off()
         ax.imshow(save_image(pred["bbox"], pred["label"], pred["mask"], **save_kwargs, nrow=int(math.sqrt(n_samples) * 2)))    
         plt.title('Output')
         plt.show()
-    if print_output:
-        print(f'bboxes:\{pred["bbox"]}\npred:\n{pred["label"]}')   
+        
+    ## Save pred as .json file        
+    predicted_layout_json = save_pred_to_json(list_files, pred, output_dir=OUTPUT_DIR, canvas_dimensions=canvas_dimensions, verbatim=verbatim)
+
+        
+    return pred, predicted_layout_json
     
-    return pred
+    

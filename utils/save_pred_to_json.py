@@ -3,14 +3,18 @@ import os
 from trainer.global_configs import OUTPUT_DIR, CANVAS_LENGTH, CANVAS_WIDTH
 
 
-def save_pred_to_json(list_files, pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False, which_page_to_save='all'):
+def save_pred_to_json(list_files, pred, output_dir=OUTPUT_DIR, canvas_dimensions=(CANVAS_WIDTH, CANVAS_LENGTH), verbatim=False, which_page_to_save='all'):
     '''
     Save pred dict with tensors to json
     To Do:
         - rescaling
     Example usage:
-        _ = save_pred_to_json(pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False)
+        _ = save_pred_to_json(pred, output_dir=OUTPUT_DIR, verbatim=False)
     '''
+    
+    # setup
+    canvas_width = canvas_dimensions[0]
+    canvas_length = canvas_dimensions[1]
     
     # translate pred to bbox_list and label_list
     ## how many objects per page
@@ -25,6 +29,8 @@ def save_pred_to_json(list_files, pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False, w
 
     # translate bbox_list and label_list into a dict and save
     output = dict()
+    if verbatim:
+        print(20*'#', ' Predicted layouts ', 20*'#')
     for page in range(n_pages):
         ## append page to dict
         output[page] = {}
@@ -35,19 +41,21 @@ def save_pred_to_json(list_files, pred, OUTPUT_DIR=OUTPUT_DIR, verbatim=False, w
             ## for given page: grab a bbox tuple, resize, and add to a dict 
             file_name = list_files[object_in_page]
             bbox_tuple = tuple(bbox_list[page][object_in_page])
-            bbox_tuple_resized = (bbox_tuple[0]*CANVAS_WIDTH, bbox_tuple[1]*CANVAS_LENGTH, bbox_tuple[2]*CANVAS_WIDTH, bbox_tuple[3]*CANVAS_LENGTH)
+            bbox_tuple_resized = (bbox_tuple[0]*canvas_width, bbox_tuple[1]*canvas_length, bbox_tuple[2]*canvas_width, bbox_tuple[3]*canvas_length)
             bbox_tuple_resized_rounded = tuple(round(elem) for elem in bbox_tuple_resized)
             output[page][file_name] = bbox_tuple_resized_rounded   
             ### dump
-            #output_file_path = os.path.join(OUTPUT_DIR, 'output.json')
+            #output_file_path = os.path.join(output_dir, 'output.json')
             #with open(output_file_path, 'w') as output_file:
             #    json.dump(output, output_file)
             ## print
             if verbatim:
-                print(f'{os.path.basename(list_files[object_in_page])}:\t\t{tuple([round(elem, 3) for elem in bbox_list[page][object_in_page]])}')
+                filepath = list_files[object_in_page]
+                #print(f'{os.path.basename(filepath)}:\t{tuple([elem for elem in output[page][filepath]])}')
+                print(f'{os.path.basename(filepath)}:\t{bbox_tuple}')
             
     # save
-    output_file_path = os.path.join(OUTPUT_DIR, 'predicted_layouts.json')
+    output_file_path = os.path.join(output_dir, 'predicted_layouts.json')
     with open(output_file_path, 'w') as output_file:
         if which_page_to_save == 'all':
             pass

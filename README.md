@@ -114,14 +114,14 @@ poetry run python3 eval.py <RESULT_DIR>
 
 ## Run on custom input data
 ### Based on data objects 
-1. Place your objects in proper /data/ subdirectories
-  - header files
+1. Place your objects in proper input/ subdirectories
+  - header files (in `input/headers`)
     - schema: `*.header`
-  - images 
+  - images (in `input/images/`)
     - schema: `*_background.png`, `*_product.png`, or `*_logo.png`
-  - text files
+  - text files (in `input/texts`)
     - schema: `*.txt`
-2. Generate data from the data stored in /data/ subdirectories
+2. Generate data from the data stored in input/ subdirectories
   - `generate_data()`
     - to get the input for the layout dm in a form of an instance of torch_geometric.data.data.Data
 3. Make predictions
@@ -136,7 +136,7 @@ poetry run python3 eval.py <RESULT_DIR>
   - `output = save_pred_to_json(list_files, pred)`
     - save the prediction in a json format (predicted_layouts.json)
   - `combine_elements_based_on_layout_dm(output)`
-    - use the layoutdm output prediction in json format stored in /output/ to combine the input data from /data/ and save them as the final output in /output/. Example:
+    - use the layoutdm output prediction in json format stored in /output/ to combine the input data from input/ and save them as the final output in /output/. Example:
     - /output/predicted_layouts.json
     - /output/combined-images_option-1.png
     - /output/combined-images_option-2.png
