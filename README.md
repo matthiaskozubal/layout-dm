@@ -35,6 +35,7 @@ Tested on WSL
 - poetry (see [official docs](https://python-poetry.org/docs/))
   ```bash
   pip install poetry==1.4.2
+  poetry config virtualenvs.create false
   poetry env use $(wchich python)
   poetry install  
   ```
