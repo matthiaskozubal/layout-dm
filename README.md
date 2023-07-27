@@ -36,7 +36,7 @@ Tested on WSL
   ```bash
   pip install poetry==1.4.2
   poetry config virtualenvs.create false
-  poetry env use $(wchich python)
+  poetry env use $(which python)
   poetry install  
   ```
 
@@ -127,7 +127,7 @@ poetry run python3 eval.py <RESULT_DIR>
     - to get the input for the layout dm in a form of an instance of torch_geometric.data.data.Data
 3. Make predictions
   - `pred = predict_layout()`
-    - to get the predictions from the layour dm in a form of an instance of torch_geometric.data.data.Data
+    - to get the predictions from the layout dm in a form of an instance of torch_geometric.data.data.Data
     - defaults:
       - model_name='layoutdm_rico'
       - cond_type='cwh' (no rescaling, just repositioning)
